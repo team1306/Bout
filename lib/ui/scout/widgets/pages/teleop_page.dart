@@ -17,7 +17,7 @@ class _TeleopPageState extends State<TeleopPage>{
     return Scaffold(
       body: Center(
         child: Column(
-          spacing: 8,
+          spacing: 15,
           children: [
             Text("Teleop"),
             Incrementer(

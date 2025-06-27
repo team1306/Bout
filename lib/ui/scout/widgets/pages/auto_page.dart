@@ -28,7 +28,7 @@ class _AutoPageState extends State<AutoPage> {
     return Scaffold(
       body: Center(
         child: Column(
-          spacing: 8,
+          spacing: 15,
           children: [
             Text("Auto"),
             ValueListenableBuilder(
