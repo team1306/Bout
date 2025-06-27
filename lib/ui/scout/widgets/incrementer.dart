@@ -36,6 +36,7 @@ class _IncrementerState extends State<Incrementer> {
         Text(widget.title),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 10,
           children: [
             ElevatedButton(
               onPressed: () => widget.stateUpdate.execute(-1),
