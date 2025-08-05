@@ -3,4 +3,5 @@ abstract final class Routes {
   static const login = '/login';
   static const signup = "/signup";
   static const scout = "/scout";
+  static const history = "/history";
 }

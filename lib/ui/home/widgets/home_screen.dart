@@ -60,6 +60,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () => context.go(Routes.scout),
                 child: Text("Scout a match"),
               ),
+              FilledButton(
+                onPressed: () => context.go(Routes.history),
+                child: Text("See history"),
+              )
             ],
           ),
         ),

@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:bout/data/repositories/auth/auth_repository.dart';
+import 'package:bout/ui/history/widgets/history_screen.dart';
 import 'package:bout/ui/home/view_models/home_viewmodel.dart';
 import 'package:bout/ui/home/widgets/home_screen.dart';
 import 'package:bout/ui/login/view_models/login_viewmodel.dart';
@@ -15,6 +16,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../ui/history/view_models/history_view_model.dart';
 import 'routes.dart';
 
 /// Top go_router entry point.
@@ -55,6 +57,10 @@ GoRouter router(AuthRepository authRepository) => GoRouter(
           (context, state) =>
               ScoutScreen(viewModel: ScoutViewModel(context.read(), context.read())),
     ),
+    GoRoute(
+      path: Routes.history,
+      builder: (context, state) => HistoryScreen(viewModel: HistoryViewModel()),
+    )
   ],
 );
 

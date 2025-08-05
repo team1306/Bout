@@ -23,9 +23,11 @@ class ScoutViewModel {
     _log.fine("Submitted match data");
     try {
       await _matchRepository.pushMatchData(false);
+      _log.fine("Successfully sent request to repository");
       return true;
     } on AppwriteException{
       _cacheRepository.addCachedMatch(await _matchRepository.getMatch());
+      _log.fine("Failed to push match data. Submitting to cache.");
       return false;
     }
   }
