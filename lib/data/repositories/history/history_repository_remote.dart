@@ -32,9 +32,4 @@ class HistoryRepositoryRemote extends HistoryRepository {
     return _apiClient.fetchAllMatchData();
   }
 
-  @override
-  Future<Set<Map<String, dynamic>>> retrieveMatchHistory() async {
-    return fetchHistory();
-  }
-
 }

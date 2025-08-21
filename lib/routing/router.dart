@@ -59,7 +59,7 @@ GoRouter router(AuthRepository authRepository) => GoRouter(
     ),
     GoRoute(
       path: Routes.history,
-      builder: (context, state) => HistoryScreen(viewModel: HistoryViewModel()),
+      builder: (context, state) => HistoryScreen(viewModel: HistoryViewModel(context.read())),
     )
   ],
 );

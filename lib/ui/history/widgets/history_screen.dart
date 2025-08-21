@@ -26,7 +26,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+        body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
 
@@ -44,7 +44,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             command: widget.viewModel.retrieveHistory,
 
             onData: (context, data, _) => SingleChildScrollView(
-              child: Column(
+              child: ListView(
                 children: data
               ),
             ),

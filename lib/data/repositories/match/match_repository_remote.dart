@@ -65,7 +65,7 @@ class MatchRepositoryRemote extends MatchRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> getMatch() async{
+  Future<Map<String, dynamic>> getMatch() async {
     final data = Map<String, dynamic>.from(_valueCache);
     data["notes"] = _notes;
     return data;
