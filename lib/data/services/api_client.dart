@@ -8,4 +8,6 @@ abstract class ApiClient {
   Future<void> pushMatchData(
     Map<String, dynamic> values, bool force
   );
+
+  Future<Set<Map<String, dynamic>>> fetchAllMatchData();
 }

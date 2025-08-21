@@ -35,6 +35,21 @@ class AppwriteApiClient implements ApiClient {
   }
 
   @override
+  Future<Set<Map<String, dynamic>>> fetchAllMatchData() async {
+    try {
+      final allMatchDocuments = await tryGetAllMatches();
+
+      Set<Map<String, dynamic>> allMatchData = {};
+      for (Document document in allMatchDocuments.documents) {
+        allMatchData.add(document.data);
+      }
+      return allMatchData;
+    } on AppwriteException catch (e) {
+      return Future.error(e);
+    }
+  }
+
+  @override
   Future<void> pushMatchData(Map<String, dynamic> values, bool force) async {
     try {
       if(!force){
@@ -66,5 +81,14 @@ class AppwriteApiClient implements ApiClient {
     );
     _log.fine("Got document list.");
     return list;
+  }
+
+  Future<DocumentList> tryGetAllMatches() async {
+    DocumentList allDocuments = await _databases.listDocuments(
+        databaseId: _databaseId,
+        collectionId: _collectionId
+    );
+    _log.fine("Got all documents.");
+    return allDocuments;
   }
 }

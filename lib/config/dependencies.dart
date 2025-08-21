@@ -4,6 +4,8 @@ import 'package:bout/data/repositories/auth/auth_repository_remote.dart';
 import 'package:bout/data/repositories/cache/cache_repository.dart';
 import 'package:bout/data/repositories/cache/cache_repository_dev.dart';
 import 'package:bout/data/repositories/cache/cache_repository_remote.dart';
+import 'package:bout/data/repositories/history/history_repository.dart';
+import 'package:bout/data/repositories/history/history_repository_remote.dart';
 import 'package:bout/data/repositories/match/match_repository.dart';
 import 'package:bout/data/repositories/match/match_repository_dev.dart';
 import 'package:bout/data/repositories/match/match_repository_remote.dart';
@@ -25,6 +27,8 @@ List<SingleChildWidget> get providersRemote {
     Provider(create: (context) => AppwriteAuthClient(appwriteClient: context.read()) as AuthClient),
     Provider(create: (context) => SharedPreferencesService()),
     Provider(create: (context) => AppwriteApiClient(context.read()) as ApiClient),
+
+    Provider(create: (context) => HistoryRepositoryRemote(context.read(), context.read(), context.read()) as HistoryRepository),
 
     ChangeNotifierProvider(
       create:
