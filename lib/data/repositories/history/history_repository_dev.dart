@@ -1,12 +1,11 @@
 import 'package:bout/data/repositories/cache/cache_repository.dart';
 import 'package:bout/data/repositories/history/history_repository.dart';
-import 'package:bout/data/services/api_client.dart';
 
 class HistoryRepositoryDev extends HistoryRepository {
 
   final CacheRepository _cacheRepository;
 
-  HistoryRepositoryDev(ApiClient apiClient, CacheRepository cacheRepository)
+  HistoryRepositoryDev(CacheRepository cacheRepository)
       : _cacheRepository = cacheRepository;
 
   @override

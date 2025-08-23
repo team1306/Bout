@@ -5,6 +5,7 @@ import 'package:bout/data/repositories/cache/cache_repository.dart';
 import 'package:bout/data/repositories/cache/cache_repository_dev.dart';
 import 'package:bout/data/repositories/cache/cache_repository_remote.dart';
 import 'package:bout/data/repositories/history/history_repository.dart';
+import 'package:bout/data/repositories/history/history_repository_dev.dart';
 import 'package:bout/data/repositories/history/history_repository_remote.dart';
 import 'package:bout/data/repositories/match/match_repository.dart';
 import 'package:bout/data/repositories/match/match_repository_dev.dart';
@@ -60,6 +61,7 @@ List<SingleChildWidget> get providersLocal {
     ),
     Provider(create: (context) => UserRepositoryDev() as UserRepository),
     Provider(create: (context) => MatchRepositoryDev() as MatchRepository),
-    Provider(create: (context) => CacheRepositoryDev() as CacheRepository)
-  ];
+    Provider(create: (context) => CacheRepositoryDev() as CacheRepository),
+    Provider(create: (context) => HistoryRepositoryDev(context.read()) as HistoryRepository
+    )];
 }
