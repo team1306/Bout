@@ -29,8 +29,6 @@ List<SingleChildWidget> get providersRemote {
     Provider(create: (context) => SharedPreferencesService()),
     Provider(create: (context) => AppwriteApiClient(context.read()) as ApiClient),
 
-    Provider(create: (context) => HistoryRepositoryRemote(context.read(), context.read(), context.read()) as HistoryRepository),
-
     ChangeNotifierProvider(
       create:
           (context) =>
@@ -40,6 +38,7 @@ List<SingleChildWidget> get providersRemote {
                   )
                   as AuthRepository,
     ),
+    Provider(create: (context) => HistoryRepositoryRemote(context.read(), context.read(), context.read()) as HistoryRepository),
     Provider(
       create:
           (context) =>
