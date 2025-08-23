@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:bout/data/repositories/match/match_repository.dart';
 import 'package:bout/data/services/api_client.dart';
 import 'package:bout/utils/null_exception.dart';
+import 'package:logging/logging.dart';
 
 class MatchRepositoryRemote extends MatchRepository {
   MatchRepositoryRemote(ApiClient apiClient)
@@ -12,11 +13,13 @@ class MatchRepositoryRemote extends MatchRepository {
   final ApiClient _apiClient;
   final Map<String, int> _valueCache;
 
+  final _log = Logger("MatchRepositoryRemote");
+
   String _notes = "";
 
   @override
   Future<int?> getValue(String identifier) async {
-    return _valueCache[identifier];
+    return _valueCache[identifier] ?? 0;
   }
 
   @override
@@ -46,7 +49,16 @@ class MatchRepositoryRemote extends MatchRepository {
 
   @override
   Future<void> pushMatchData(bool force) async {
-    return _apiClient.pushMatchData(await getMatch(), force);
+    try {
+      _valueCache["info.type"] = 0; //manually setting to qualifier
+      final matchData = await getMatch();
+      _log.fine("Submitting $matchData");
+      _apiClient.pushMatchData(matchData, force);
+      _log.fine("Successfully sent request to api client");
+      return;
+    } catch (e) {
+      return Future.error(e);
+    }
   }
 
   @override
