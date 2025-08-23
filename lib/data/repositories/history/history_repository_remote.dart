@@ -1,16 +1,17 @@
 import 'package:bout/data/repositories/cache/cache_repository.dart';
 import 'package:bout/data/services/api_client.dart';
 import 'package:bout/data/services/auth/appwrite_auth_client.dart';
+import 'package:bout/data/services/auth/auth_client.dart';
 
 import 'history_repository.dart';
 
 class HistoryRepositoryRemote extends HistoryRepository {
 
-  final AppwriteAuthClient _authClient;
+  final AuthClient _authClient;
   final ApiClient _apiClient;
   final CacheRepository _cacheRepository;
 
-  HistoryRepositoryRemote(AppwriteAuthClient authClient, ApiClient apiClient, CacheRepository cacheRepository)
+  HistoryRepositoryRemote(AuthClient authClient, ApiClient apiClient, CacheRepository cacheRepository)
       : _authClient = authClient, _apiClient = apiClient, _cacheRepository = cacheRepository;
 
   @override
