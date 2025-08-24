@@ -25,21 +25,7 @@ class MatchRepositoryRemote extends MatchRepository {
   }
 
   @override
-  Future<void> pullMatchData() async {
-    //Assume safety since controlled operation
-    final match = await getValue("info.match");
-    final robot = await getValue("info.robot");
-    final matchType = await getValue("info.type");
-
-    if (match == null) {
-      return Future.error(NullException(message: "Match cannot be null"));
-    }
-    if (robot == null) {
-      return Future.error(NullException(message: "Robot cannot be null"));
-    }
-    if (matchType == null) {
-      return Future.error(NullException(message: "Match type cannot be null"));
-    }
+  Future<void> pullMatchData(int match, int robot, int matchType) async {
 
     final result = await _apiClient.fetchMatchData(matchType, match, robot);
 

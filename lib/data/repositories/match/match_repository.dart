@@ -7,7 +7,7 @@ abstract class MatchRepository {
   Future<void> setValue(String identifier, int value);
 
   ///Pulls match data and updates the repository to match
-  Future<void> pullMatchData();
+  Future<void> pullMatchData(int robot, int match, int matchType);
 
   ///Puts match data to storage
   Future<void> pushMatchData(bool force);

@@ -20,7 +20,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     super.initState();
-    widget.viewModel.retrieveHistory.execute(); //Execute on page load
+    widget.viewModel.loadHistory.execute(context); //Execute on page load
   }
 
   @override
@@ -31,7 +31,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         children: [
 
           FilledButton(
-            onPressed: widget.viewModel.retrieveHistory.execute,
+            onPressed: () => widget.viewModel.loadHistory.execute(context),
             child: Row(
               children: [
                 Text("Refresh"),
@@ -41,7 +41,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
 
           CommandBuilder(
-            command: widget.viewModel.retrieveHistory,
+            command: widget.viewModel.loadHistory,
 
             onData: (context, data, _) => Expanded(
               child: ListView(

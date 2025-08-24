@@ -14,7 +14,7 @@ class MatchRepositoryDev extends MatchRepository {
   }
 
   @override
-  Future<void> pullMatchData() async {
+  Future<void> pullMatchData(int robot, int match, int matchType) async {
     _valueCache.clear();
   }
 
