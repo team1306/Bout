@@ -81,4 +81,12 @@ class AppwriteAuthClient extends AuthClient {
       return Future.error(e);
     }
   }
+
+  @override
+  Future<String> getCurrentUserId() async {
+    User user = await _account.get();
+    final userId = user.$id;
+    _log.fine("Got user id: $userId");
+    return userId;
+  }
 }

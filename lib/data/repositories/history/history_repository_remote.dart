@@ -1,7 +1,7 @@
 import 'package:bout/data/repositories/cache/cache_repository.dart';
 import 'package:bout/data/services/api_client.dart';
-import 'package:bout/data/services/auth/appwrite_auth_client.dart';
 import 'package:bout/data/services/auth/auth_client.dart';
+import 'package:logging/logging.dart';
 
 import 'history_repository.dart';
 
@@ -11,6 +11,8 @@ class HistoryRepositoryRemote extends HistoryRepository {
   final ApiClient _apiClient;
   final CacheRepository _cacheRepository;
 
+  final _log = Logger("HistoryRepositoryRemote");
+
   HistoryRepositoryRemote(AuthClient authClient, ApiClient apiClient, CacheRepository cacheRepository)
       : _authClient = authClient, _apiClient = apiClient, _cacheRepository = cacheRepository;
 
@@ -18,19 +20,29 @@ class HistoryRepositoryRemote extends HistoryRepository {
   Future<Set<Map<String, dynamic>>> fetchHistory() async {
     Set<Map<String, dynamic>> matches = await getCachedMatches();
     matches.addAll(await getServerMatches());
-    matches.retainWhere((match) => match["scouter"] == _authClient.getCurrentUser()); //filter to only matches this user scouted
+    for (dynamic match in matches) {
+      _log.fine("info.scouterId is ${match["info.scouterId"]}. Current User Id is ${_authClient.getCurrentUserId()}");
+    }
+    String userId = await _authClient.getCurrentUserId();
+    matches.retainWhere((match) => match["info.scouterId"] == userId); //filter to only matches this user scouted
+
+    _log.fine("History matches: $matches");
 
     return matches;
   }
 
   @override
-  Future<Set<Map<String, dynamic>>> getCachedMatches() {
-    return _cacheRepository.cache;
+  Future<Set<Map<String, dynamic>>> getCachedMatches() async {
+    Set<Map<String, dynamic>> cache = await _cacheRepository.cache;
+    _log.fine("Got cached matches: $cache");
+    return Future.value(cache);
   }
 
   @override
-  Future<Set<Map<String, dynamic>>> getServerMatches() {
-    return _apiClient.fetchAllMatchData();
+  Future<Set<Map<String, dynamic>>> getServerMatches() async {
+    Set<Map<String, dynamic>> matches = await _apiClient.fetchAllMatchData();
+    _log.fine("Got server matches: $matches");
+    return Future.value(matches);
   }
 
 }

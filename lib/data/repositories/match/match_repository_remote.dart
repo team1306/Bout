@@ -2,15 +2,17 @@ import 'dart:collection';
 
 import 'package:bout/data/repositories/match/match_repository.dart';
 import 'package:bout/data/services/api_client.dart';
+import 'package:bout/data/services/auth/auth_client.dart';
 import 'package:bout/utils/null_exception.dart';
 import 'package:logging/logging.dart';
 
 class MatchRepositoryRemote extends MatchRepository {
-  MatchRepositoryRemote(ApiClient apiClient)
-    : _apiClient = apiClient,
+  MatchRepositoryRemote(ApiClient apiClient, AuthClient authClient)
+    : _apiClient = apiClient, _authClient = authClient,
       _valueCache = HashMap();
 
   final ApiClient _apiClient;
+  final AuthClient _authClient;
   final Map<String, int> _valueCache;
 
   final _log = Logger("MatchRepositoryRemote");
@@ -50,7 +52,6 @@ class MatchRepositoryRemote extends MatchRepository {
   @override
   Future<void> pushMatchData(bool force) async {
     try {
-      _valueCache["info.type"] = 0; //manually setting to qualifier
       final matchData = await getMatch();
       _log.fine("Submitting $matchData");
       _apiClient.pushMatchData(matchData, force);
@@ -79,7 +80,10 @@ class MatchRepositoryRemote extends MatchRepository {
   @override
   Future<Map<String, dynamic>> getMatch() async {
     final data = Map<String, dynamic>.from(_valueCache);
+
+    data["info.type"] = 0; //manually setting to qualifier
     data["notes"] = _notes;
+    data["info.scouterId"] = await _authClient.getCurrentUserId();
     return data;
   }
 }

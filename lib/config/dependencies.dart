@@ -46,7 +46,7 @@ List<SingleChildWidget> get providersRemote {
     ),
     Provider(
       create:
-          (context) => MatchRepositoryRemote(context.read()) as MatchRepository,
+          (context) => MatchRepositoryRemote(context.read(), context.read()) as MatchRepository,
     ),
     Provider(create: (context) => CacheRepositoryRemote(context.read()) as CacheRepository),
     Provider(create: (context) => HistoryRepositoryRemote(context.read(), context.read(), context.read()) as HistoryRepository),

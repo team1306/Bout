@@ -2,9 +2,12 @@ import 'package:bout/data/repositories/history/history_repository.dart';
 import 'package:bout/data/repositories/match/match_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_command/flutter_command.dart';
+import 'package:logging/logging.dart';
 
 class HistoryViewModel {
   final HistoryRepository _historyRepository;
+
+  final _log = Logger("HistoryViewModel");
 
   late final Command<void, List<Widget>> retrieveHistory;
 
@@ -20,11 +23,11 @@ class HistoryViewModel {
     //if ()
 
     for (Map<String, dynamic> match in history) {
-      String text = "Scouted team ${match["info.robot"]} in match ${MatchType.getName(match["info.type"])} ${match["info.match"]}";
-
+      String text = "Scouted team ${match["info.robot"]} in match ${MatchType
+          .getName(int.parse(match["info.type"]))} ${match["info.match"]}";
       widgetList.add(InkWell(
         child: Text(text),
-        onTap: () => {},
+        onTap: () => {}, //TODO: Open scouting page with desired info
       ));
     }
 

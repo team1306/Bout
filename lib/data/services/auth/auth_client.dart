@@ -11,5 +11,7 @@ abstract class AuthClient {
   
   Future<User> getCurrentUser();
 
+  Future<String> getCurrentUserId();
+
   Future<void> logout();
 }

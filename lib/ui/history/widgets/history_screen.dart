@@ -43,10 +43,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
           CommandBuilder(
             command: widget.viewModel.retrieveHistory,
 
-            onData: (context, data, _) => SingleChildScrollView(
+            onData: (context, data, _) => Expanded(
               child: ListView(
-                //children: data
-              ),
+                children: data
+              )
             ),
 
             whileExecuting: (context, command, _) => Center(child: CircularProgressIndicator()),
