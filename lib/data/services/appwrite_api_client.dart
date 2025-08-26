@@ -28,7 +28,7 @@ class AppwriteApiClient implements ApiClient {
       final list = await tryGetMatch(matchNumber, robotNumber, matchType);
       _log.fine("Got document list.");
       if(list.total != 1) return Future.error(ArgumentError("Document not found for match ${MatchType.getName(matchType)} $matchNumber, robot $robotNumber"));
-      
+
       return list.documents[0].data;
     } on AppwriteException catch (e){
       return Future.error(e);
@@ -77,7 +77,7 @@ class AppwriteApiClient implements ApiClient {
         Query.equal("info.type", matchType),
       ],
     );
-    _log.fine("Got document list: ${list.documents[0].data}");
+    _log.fine("Got document list: ${list.documents}");
     return list;
   }
 

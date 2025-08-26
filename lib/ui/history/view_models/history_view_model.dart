@@ -40,7 +40,6 @@ class HistoryViewModel {
   }
 
   void _openHistoryScout(int robot, int match, int matchType, BuildContext context) {
-    _matchRepository.pullMatchData(robot, match, matchType);
     context.goNamed(Routes.scout, pathParameters: {"robot": robot.toString(), "match": match.toString(), "type": matchType.toString()});
   }
 }
