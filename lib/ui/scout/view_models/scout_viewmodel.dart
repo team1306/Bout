@@ -43,6 +43,7 @@ class ScoutViewModel {
 
     if (robot == null || match == null || type == null) throw NullException(message: "Scout page tried load from incomplete match identifiers");
     matchRepository.pullMatchData(int.parse(robot), int.parse(match), int.parse(type));
+    _log.fine("Loaded scout page from existing match");
   }
 
   final MatchRepository _matchRepository;

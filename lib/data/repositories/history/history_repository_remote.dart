@@ -19,16 +19,11 @@ class HistoryRepositoryRemote extends HistoryRepository {
   @override
   Future<Set<Map<String, dynamic>>> fetchHistory() async {
     Set<Map<String, dynamic>> matches = await getCachedMatches();
-    _log.fine("Got cached matches: $matches");
     matches.addAll(await getServerMatches());
     String userId = await _authClient.getCurrentUserId();
-    for (dynamic match in matches) {
-      _log.fine("info.scouterId is ${match["info.scouterId"]}. Current User Id is ${_authClient.getCurrentUserId()}");
-    }
     matches.retainWhere((match) => match["info.scouterId"] == userId); //filter to only matches this user scouted
 
-    _log.fine("History matches: $matches");
-
+    _log.fine("Fetched History");
     return matches;
   }
 
