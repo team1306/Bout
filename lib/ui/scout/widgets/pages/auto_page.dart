@@ -31,26 +31,19 @@ class _AutoPageState extends State<AutoPage> {
           spacing: 15,
           children: [
             Text("Auto"),
-            ValueListenableBuilder(
-              valueListenable: _leaveUpdate,
-              builder: (context, result, child) {
-                if (_leaveUpdate.results.value.isExecuting) {
-                  return Text("~");
-                }
-      
-                if (_leaveUpdate.results.value.hasError) {
-                  return ErrorIndicator(
+            CommandBuilder(
+              command: _leaveUpdate,
+              onError:
+                  (_, _, _, _) => ErrorIndicator(
                     title: "State error",
                     label: "Try Again",
                     onPressed: () => _leaveUpdate.execute(0),
-                  );
-                }
-      
-                return Checkbox(
-                  value: result == 1,
-                  onChanged: (value) => _leaveUpdate.execute(value! ? 1 : 0),
-                );
-              },
+                  ),
+              onData:
+                  (context, result, parameter) => Checkbox(
+                    value: result == 1,
+                    onChanged: (value) => _leaveUpdate.execute(value! ? 1 : 0),
+                  ),
             ),
             Incrementer(
               title: "Auto L1",
