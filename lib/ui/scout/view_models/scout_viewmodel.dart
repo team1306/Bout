@@ -1,6 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:bout/data/repositories/cache/cache_repository.dart';
 import 'package:bout/data/repositories/match/match_repository.dart';
+import 'package:bout/ui/scout/widgets/incrementer.dart';
 import 'package:bout/utils/null_exception.dart';
 import 'package:flutter_command/flutter_command.dart';
 import 'package:logging/logging.dart';
@@ -14,6 +15,7 @@ class ScoutViewModel {
     "auto.l3" : 0,
     "auto.l4" : 0,
     "auto.process" : 0,
+    "auto.net" : 0,
     "end.climb" : 0,
     "end.role" : 0,
     "end.driver" : 1,
@@ -29,30 +31,45 @@ class ScoutViewModel {
   
   ScoutViewModel(MatchRepository scoutRepository, CacheRepository cacheRepository)
     : _matchRepository = scoutRepository, _cacheRepository = cacheRepository {
-    notesUpdate = Command.createAsync(_updateNotes, initialValue: "");
-    submitMatchData = Command.createAsyncNoParam(_submitMatchData, initialValue: false);
 
     _matchRepository.putCustomData(defaultValues);
     _matchRepository.setNotes("");
+    _createCommonValues(); 
   }
 
   ScoutViewModel.loadMatch(MatchRepository matchRepository, CacheRepository cacheRepository, String? robot, String? match, String? type)
     : _matchRepository = matchRepository, _cacheRepository = cacheRepository {
-    notesUpdate = Command.createAsync(_updateNotes, initialValue: "");
-    submitMatchData = Command.createAsyncNoParam(_submitMatchData, initialValue: false);
 
     if (robot == null || match == null || type == null) throw NullException(message: "Scout page tried load from incomplete match identifiers");
     matchRepository.pullMatchData(int.parse(robot), int.parse(match), int.parse(type));
     _log.fine("Loaded scout page from existing match");
+
+    _createCommonValues();
   }
+  
+  late final Map<String, Command<void, int?>> _getCommands;
+  late final Map<String, Command<int, void>> _setCommands;
+  late final Map<String, Command<int, void>> _changeCommands;
 
   final MatchRepository _matchRepository;
   final CacheRepository _cacheRepository;
 
   final _log = Logger('ScoutViewModel');
 
-  late final Command<String?, String> notesUpdate;
+  late final Command<void, String?> notesGet;
+  late final Command<String, void> notesSet;
+
   late final Command<void, bool> submitMatchData;
+  
+  void _createCommonValues() {
+    submitMatchData = Command.createAsyncNoParam(_submitMatchData, initialValue: false);
+    notesGet = Command.createAsyncNoParam(_getNotes, initialValue: "");
+    notesSet = Command.createAsyncNoResult(_setNotes);
+    
+    _getCommands = createGetCommands();
+    _changeCommands = createChangeCommands();
+    _setCommands = createSetCommands();
+  }
   
   Future<bool> _submitMatchData() async{
     _log.fine("Submitted match data");
@@ -66,20 +83,18 @@ class ScoutViewModel {
       return false;
     }
   }
-
-  Future<String> _updateNotes(String? notes) async {
-    if (notes != null) await _matchRepository.setNotes(notes);
-    return await _matchRepository.getNotes();
+  
+  Future<String?> _getNotes(){
+    return _matchRepository.getNotes();
   }
-
-  Future<int> _updateChangeValue(String identifier, int? amount) async {
-    if (amount != null) await _changeValue(identifier, amount);
-    return await _retrieveValue(identifier);
+  
+  Future<void> _setNotes(String notes){
+    return _matchRepository.setNotes(notes);
   }
 
   Future<void> _changeValue(String identifier, int amount) async {
-    final value = await _retrieveValue(identifier);
-    return await _setValue(identifier, value + amount);
+    final value = await _getValue(identifier);
+    return await _setValue(identifier, value! + amount);
   }
 
   Future<void> _setValue(String identifier, int value) {
@@ -87,37 +102,53 @@ class ScoutViewModel {
       ..then((_) => _log.fine("Set $identifier value to $value"));
   }
 
-  Future<int> _updateValue(String identifier, int? value) async {
-    if (value != null) await _setValue(identifier, value);
-    return await _retrieveValue(identifier);
-  }
-
-  ///Produces a side effect. If the key does not exist, it will create a new one with a value of 0
-  Future<int> _retrieveValue(String identifier) async {
+  Future<int?> _getValue(String identifier) async {
     final value = await _matchRepository.getValue(identifier);
-    if (value == null) await _setValue(identifier, 0);
     _log.fine("Got $identifier value: $value");
-    return value ?? 0;
+    return value;
+  }
+  
+  Command<void, int?> getRetrievalCommand(String identifier){
+    return _getCommands[identifier]!;
   }
 
-  Command<int?, int> createStateUpdate(String identifier) =>
-      Command.createAsync(
-        (value) => _updateValue(identifier, value),
-        initialValue: 0,
-      );
+  Command<int, void> getSetCommand(String identifier){
+    return _setCommands[identifier]!;
+  }
 
-  Command<int?, int> createStateChange(String identifier) =>
-      Command.createAsync(
-        (value) => _updateChangeValue(identifier, value),
-        initialValue: 0,
-      );
+  Command<int, void> getChangeCommand(String identifier){
+    return _changeCommands[identifier]!;
+  }
 
-  Command<int, void> createStateSet(String identifier) =>
-      Command.createAsyncNoResult((value) => _setValue(identifier, value));
+  Map<String, Command<void, int?>> createGetCommands(){
+    Map<String, Command<void, int?>> map = {};
+    defaultValues.forEach((identifier, value) {
+      map[identifier] = createGetCommand(identifier, value);
+    });
+    return map;
+  }
 
-  Command<void, int> createStateRetrieve(String identifier) =>
-      Command.createAsyncNoParam(
-        () => _retrieveValue(identifier),
-        initialValue: 0,
-      );
+  Map<String, Command<int, void>> createSetCommands(){
+    Map<String, Command<int, void>>  map = {};
+    defaultValues.forEach((identifier, value) {
+      map[identifier] = createSetCommand(identifier);
+    });
+    return map;
+  }
+
+  Map<String, Command<int, void>> createChangeCommands(){
+    Map<String, Command<int, void>>  map = {};
+    defaultValues.forEach((identifier, value) {
+      map[identifier] = createChangeCommand(identifier);
+    });
+    return map;
+  }
+  
+  Command<int, void> createChangeCommand(String identifier) => Command.createAsyncNoResult((value) => _changeValue(identifier, value));
+  Command<void, int?> createGetCommand(String identifier, int initialValue) => Command.createAsyncNoParam(() => _getValue(identifier), initialValue: initialValue);
+  Command<int, void> createSetCommand(String identifier) => Command.createAsyncNoResult((value) => _setValue(identifier, value));
+  
+  Incrementer buildIncrementer(String title, String identifier){
+    return Incrementer(title: title, changeState: getChangeCommand(identifier), getState: getRetrievalCommand(identifier));
+  }
 }

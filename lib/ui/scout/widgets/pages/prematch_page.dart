@@ -13,25 +13,30 @@ class PrematchPage extends StatefulWidget {
 }
 
 class _PrematchPageState extends State<PrematchPage> {
-  late final Command<int?, int> _matchUpdate;
-  late final Command<int?, int> _robotUpdate;
+  late final Command<int, void> _matchSet;
+  late final Command<void, int?> _matchGet;
+  late final Command<void, int?> _robotGet;
+  late final Command<int, void> _robotSet;
 
   @override
   void initState() {
     super.initState();
+    _matchGet = widget.viewModel.getRetrievalCommand("info.match");
+    _robotGet = widget.viewModel.getRetrievalCommand("info.robot");
 
-    _matchUpdate = widget.viewModel.createStateUpdate("info.match");
-    _matchUpdate.execute(null);
-
-    _robotUpdate = widget.viewModel.createStateUpdate("info.robot");
-    _robotUpdate.execute(null);
+    _matchSet = widget.viewModel.getSetCommand("info.match");
+    _robotSet = widget.viewModel.getSetCommand("info.robot");
+    
+    _matchGet.execute();
+    _robotGet.execute();
   }
   
   @override
   void didUpdateWidget(PrematchPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _matchUpdate.execute(null);
-    _robotUpdate.execute(null);
+    
+    _matchGet.execute();
+    _robotGet.execute();
   }
 
   @override
@@ -43,35 +48,25 @@ class _PrematchPageState extends State<PrematchPage> {
           children: [
             Text("Prematch"),
             Text("Match Number"),
-            ValueListenableBuilder(
-              valueListenable: _matchUpdate,
-              builder: (context, result, child) {
-                return TextField(
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  keyboardType: TextInputType.number,
-                  controller: TextEditingController(text: result.toString()),
-                  onChanged:
-                      (value) => widget.viewModel
-                          .createStateSet("info.match")
-                          .execute(int.parse(value.isEmpty ? "0" : value)),
-                );
-              },
-            ),
+            CommandBuilder(command: _matchGet, onData: (context, result, param) {
+              return TextField(
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                keyboardType: TextInputType.number,
+                controller: TextEditingController(text: result.toString()),
+                onChanged:
+                    (value) => _matchSet.execute(int.parse(value.isEmpty ? "0" : value)),
+              );
+            },),
             Text("Robot Number"),
-            ValueListenableBuilder(
-              valueListenable: _robotUpdate,
-              builder: (context, result, child) {
-                return TextField(
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  keyboardType: TextInputType.number,
-                  controller: TextEditingController(text: result.toString()),
-                  onChanged:
-                      (value) => widget.viewModel
-                      .createStateSet("info.robot")
-                      .execute(int.parse(value.isEmpty ? "0" : value)),
-                );
-              },
-            ),
+            CommandBuilder(command: _robotGet, onData: (context, result, param) {
+              return TextField(
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                keyboardType: TextInputType.number,
+                controller: TextEditingController(text: result.toString()),
+                onChanged:
+                    (value) => _robotSet.execute(int.parse(value.isEmpty ? "0" : value)),
+              );
+            },),
           ],
         ),
       ),

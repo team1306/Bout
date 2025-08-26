@@ -1,5 +1,4 @@
 import 'package:bout/ui/scout/view_models/scout_viewmodel.dart';
-import 'package:bout/ui/scout/widgets/incrementer.dart';
 import 'package:flutter/material.dart';
 
 class TeleopPage extends StatefulWidget{
@@ -20,30 +19,12 @@ class _TeleopPageState extends State<TeleopPage>{
           spacing: 15,
           children: [
             Text("Teleop"),
-            Incrementer(
-              title: "Teleop L1",
-              stateUpdate: widget.viewModel.createStateChange("teleop.l1"),
-            ),
-            Incrementer(
-              title: "Teleop L2",
-              stateUpdate: widget.viewModel.createStateChange("teleop.l2"),
-            ),
-            Incrementer(
-              title: "Teleop L3",
-              stateUpdate: widget.viewModel.createStateChange("teleop.l3"),
-            ),
-            Incrementer(
-              title: "Teleop L4",
-              stateUpdate: widget.viewModel.createStateChange("teleop.l4"),
-            ),
-            Incrementer(
-              title: "Teleop Processor",
-              stateUpdate: widget.viewModel.createStateChange("teleop.process"),
-            ),
-            Incrementer(
-              title: "Teleop Net",
-              stateUpdate: widget.viewModel.createStateChange("teleop.net"),
-            ),
+            widget.viewModel.buildIncrementer("Teleop L1", "teleop.l1"),
+            widget.viewModel.buildIncrementer("Teleop L2", "teleop.l2"),
+            widget.viewModel.buildIncrementer("Teleop L3", "teleop.l3"),
+            widget.viewModel.buildIncrementer("Teleop L4", "teleop.l4"),
+            widget.viewModel.buildIncrementer("Teleop Processor", "teleop.process"),
+            widget.viewModel.buildIncrementer("Teleop Net", "teleop.net"),
           ],
         ),
       ),

@@ -1,15 +1,19 @@
-import 'package:bout/ui/core/widgets/error_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_command/flutter_command.dart';
 
 class Incrementer extends StatefulWidget {
-  const Incrementer({
+  Incrementer({
     super.key,
-    required this.title, required this.stateUpdate,
-  });
+    required this.title,
+    required this.changeState,
+    required this.getState,
+  }){
+    changeState.addListener(getState.execute);
+  }
 
   final String title;
-  final Command<int?, int> stateUpdate;
+  final Command<int, void> changeState;
+  final Command<void, int?> getState;
 
   @override
   State<Incrementer> createState() => _IncrementerState();
@@ -20,13 +24,13 @@ class _IncrementerState extends State<Incrementer> {
   @override
   void initState() {
     super.initState();
-    widget.stateUpdate.execute(null);
+    widget.getState.execute();
   }
   
   @override
   void didUpdateWidget(Incrementer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    widget.stateUpdate.execute(null);
+    widget.getState.execute();
   }
   
   @override
@@ -39,28 +43,16 @@ class _IncrementerState extends State<Incrementer> {
           spacing: 10,
           children: [
             ElevatedButton(
-              onPressed: () => widget.stateUpdate.execute(-1),
+              onPressed: () => widget.changeState.execute(-1),
               child: Icon(Icons.remove),
             ),
-            ValueListenableBuilder(
-              valueListenable: widget.stateUpdate,
-              builder: (context, result, child) {
-                if (widget.stateUpdate.results.value.isExecuting) {
-                  return Text("~");
-                }
-                
-                if (widget.stateUpdate.results.value.hasError) {
-                  return ErrorIndicator(
-                    title: "State error",
-                    label: "Try Again",
-                    onPressed: () => widget.stateUpdate.execute(0),
-                  );
-                }
-                return Text("$result");
-              },
+            CommandBuilder(
+              command: widget.getState,
+              onData: (context, result, _) => Text("$result"),
+              whileExecuting: (_, _, _) => const Text("~"),
             ),
             ElevatedButton(
-              onPressed: () => widget.stateUpdate.execute(1),
+              onPressed: () => widget.changeState.execute(1),
               child: Icon(Icons.add),
             ),
           ],
