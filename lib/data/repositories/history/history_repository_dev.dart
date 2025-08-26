@@ -18,7 +18,7 @@ class HistoryRepositoryDev extends HistoryRepository {
 
   @override
   Future<Set<Map<String, dynamic>>> getCachedMatches() {
-    return _cacheRepository.cache;
+    return _cacheRepository.getCache();
   }
 
   @override

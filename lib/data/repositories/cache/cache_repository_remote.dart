@@ -16,9 +16,6 @@ class CacheRepositoryRemote extends CacheRepository {
   }
 
   @override
-  Future<Set<Map<String, dynamic>>> get cache => Future.value(_cache);
-
-  @override
   Future<void> clearCache() async {
     _cache.clear();
     _log.fine("Match cache cleared");
@@ -30,5 +27,10 @@ class CacheRepositoryRemote extends CacheRepository {
       await _client.pushMatchData(match, force);
       _log.fine("${match["info.type"]} Match ${match["info.match"]} with the robot ${match["info.robot"]} pushed");
     }
+  }
+
+  @override
+  Future<Set<Map<String, dynamic>>> getCache() async {
+    return _cache.map((value) => Map<String, dynamic>.from(value)).toSet();
   }
 }

@@ -10,5 +10,5 @@ abstract class CacheRepository {
   Future<void> clearCache();
 
   ///Gets the cache
-  Future<Set<Map<String, dynamic>>> get cache;
+  Future<Set<Map<String, dynamic>>> getCache();
 }

@@ -29,7 +29,7 @@ class HistoryRepositoryRemote extends HistoryRepository {
 
   @override
   Future<Set<Map<String, dynamic>>> getCachedMatches() async {
-    Set<Map<String, dynamic>> cache = await _cacheRepository.cache;
+    Set<Map<String, dynamic>> cache = await _cacheRepository.getCache();
     _log.fine("Got cached matches: $cache");
     return Future.value(cache);
   }
