@@ -8,10 +8,7 @@ class CacheRepositoryDev extends CacheRepository{
   Future<void> addCachedMatch(Map<String, dynamic> match) async{
     _cache.add(match);
   }
-
-  @override
-  Future<Set<Map<String, dynamic>>> get cache => Future.value(_cache);
-
+  
   @override
   Future<void> clearCache() async{
     _cache.clear();
@@ -20,5 +17,10 @@ class CacheRepositoryDev extends CacheRepository{
   @override
   Future<void> pushMatches(bool force) async {
     
+  }
+
+  @override
+  Future<Set<Map<String, dynamic>>> getCache() async {
+    return _cache.map((value) => Map<String, dynamic>.from(value)).toSet();
   }
 }
