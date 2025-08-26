@@ -9,13 +9,14 @@ import 'package:logging/logging.dart';
 
 class HistoryViewModel {
   final HistoryRepository _historyRepository;
+  final MatchRepository _matchRepository;
 
   final _log = Logger("HistoryViewModel");
 
   late final Command<BuildContext, List<Widget>> loadHistory;
 
-  HistoryViewModel(HistoryRepository historyRepository)
-    : _historyRepository = historyRepository {
+  HistoryViewModel(HistoryRepository historyRepository, MatchRepository matchRepository)
+    : _historyRepository = historyRepository, _matchRepository = matchRepository {
     loadHistory = Command.createAsync(_retrieveHistory, initialValue: []);
   }
 
@@ -25,16 +26,13 @@ class HistoryViewModel {
     Set<Map<String, dynamic>> history = await _historyRepository.fetchHistory();
 
     for (Map<String, dynamic> match in history) {
-      int robot = match["info.robot"];
-      int matchNum = match["info.match"];
-      int type = match["info.type"];
+      int robot = int.parse(match["info.robot"]);
+      int matchNum = int.parse(match["info.match"]);
+      int type = int.parse(match["info.type"]);
       String text = "Scouted team $robot in match ${MatchType.getName(type)} $matchNum";
       widgetList.add(InkWell(
         child: Text(text),
-        onTap: () => {//TODO: Open scouting page with desired info
-
-          _openHistoryScout(robot, matchNum, type, context)
-        },
+        onTap: () => _openHistoryScout(robot, matchNum, type, context)
       ));
     }
 
@@ -42,7 +40,7 @@ class HistoryViewModel {
   }
 
   void _openHistoryScout(int robot, int match, int matchType, BuildContext context) {
-    context.go(Routes.scout);
-
+    _matchRepository.pullMatchData(robot, match, matchType);
+    context.goNamed(Routes.scout, pathParameters: {"robot": robot.toString(), "match": match.toString(), "type": matchType.toString()});
   }
 }

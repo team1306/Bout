@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:bout/data/repositories/match/match_repository.dart';
+import 'package:bout/data/repositories/match/match_type.dart';
 import 'package:bout/data/services/api_client.dart';
 import 'package:bout/data/services/auth/auth_client.dart';
 import 'package:bout/utils/null_exception.dart';
@@ -25,9 +26,16 @@ class MatchRepositoryRemote extends MatchRepository {
   }
 
   @override
-  Future<void> pullMatchData(int match, int robot, int matchType) async {
+  void clearAllValues() {
+    _valueCache.clear();
+    _notes = "";
+  }
+
+  @override
+  Future<void> pullMatchData(int robot, int match, int matchType) async {
 
     final result = await _apiClient.fetchMatchData(matchType, match, robot);
+    _log.fine("Pulled match data for match ${MatchType.getName(matchType)} $match, robot $robot: $result");
 
     _notes = result.remove("notes");
 

@@ -14,6 +14,8 @@ abstract class MatchRepository {
   
   ///Get cached notes
   Future<String> getNotes();
+
+  void clearAllValues();
   
   ///Set cached notes
   Future<void> setNotes(String notes);

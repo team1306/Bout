@@ -42,4 +42,10 @@ class MatchRepositoryDev extends MatchRepository {
     data["notes"] = _notes;
     return data;  
   }
+
+  @override
+  void clearAllValues() {
+    _valueCache.clear();
+    _notes = "";
+  }
 }

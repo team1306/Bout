@@ -1,6 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:bout/data/repositories/cache/cache_repository.dart';
 import 'package:bout/data/repositories/match/match_repository.dart';
+import 'package:bout/utils/null_exception.dart';
 import 'package:flutter_command/flutter_command.dart';
 import 'package:logging/logging.dart';
 
@@ -9,6 +10,17 @@ class ScoutViewModel {
     : _matchRepository = scoutRepository, _cacheRepository = cacheRepository {
     notesUpdate = Command.createAsync(_updateNotes, initialValue: "");
     submitMatchData = Command.createAsyncNoParam(_submitMatchData, initialValue: false);
+
+    _matchRepository.clearAllValues();
+  }
+
+  ScoutViewModel.loadMatch(MatchRepository matchRepository, CacheRepository cacheRepository, String? robot, String? match, String? type)
+    : _matchRepository = matchRepository, _cacheRepository = cacheRepository {
+    notesUpdate = Command.createAsync(_updateNotes, initialValue: "");
+    submitMatchData = Command.createAsyncNoParam(_submitMatchData, initialValue: false);
+
+    if (robot == null || match == null || type == null) throw NullException(message: "Scout page tried load from incomplete match identifiers");
+    matchRepository.pullMatchData(int.parse(robot), int.parse(match), int.parse(type));
   }
 
   final MatchRepository _matchRepository;

@@ -12,6 +12,7 @@ import 'package:bout/ui/scout/view_models/scout_viewmodel.dart';
 import 'package:bout/ui/scout/widgets/scout_screen.dart';
 import 'package:bout/ui/signup/view_models/signup_viewmodel.dart';
 import 'package:bout/ui/signup/widgets/signup_screen.dart';
+import 'package:bout/utils/null_exception.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -58,8 +59,19 @@ GoRouter router(AuthRepository authRepository) => GoRouter(
               ScoutScreen(viewModel: ScoutViewModel(context.read(), context.read())),
     ),
     GoRoute(
+      path: "${Routes.scout}/:robot/:match/:type",
+      name: Routes.scout,
+      builder:
+      (context, state) =>
+          ScoutScreen(viewModel: ScoutViewModel.loadMatch(context.read(), context.read(),
+            state.pathParameters['robot'],
+            state.pathParameters['match'],
+            state.pathParameters['type'],
+          ))
+    ),
+    GoRoute(
       path: Routes.history,
-      builder: (context, state) => HistoryScreen(viewModel: HistoryViewModel(context.read())),
+      builder: (context, state) => HistoryScreen(viewModel: HistoryViewModel(context.read(), context.read())),
     )
   ],
 );

@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:bout/data/repositories/match/match_type.dart';
 import 'package:bout/data/services/api_client.dart';
 import 'package:bout/data/services/appwrite_client.dart';
 import 'package:logging/logging.dart';
@@ -26,9 +27,9 @@ class AppwriteApiClient implements ApiClient {
     try {
       final list = await tryGetMatch(matchNumber, robotNumber, matchType);
       _log.fine("Got document list.");
-      if(list.total != 1) return Future.error(ArgumentError("Valid document not found"));
+      if(list.total != 1) return Future.error(ArgumentError("Document not found for match ${MatchType.getName(matchType)} $matchNumber, robot $robotNumber"));
       
-      return list.documents[0].data as Map<String, int>;
+      return list.documents[0].data;
     } on AppwriteException catch (e){
       return Future.error(e);
     }
@@ -70,6 +71,7 @@ class AppwriteApiClient implements ApiClient {
   }
   
   Future<DocumentList> tryGetMatch(int matchNumber, int robotNumber, int matchType) async{
+
     final list = await _databases.listDocuments(
       databaseId: _databaseId,
       collectionId: _collectionId,
@@ -79,7 +81,7 @@ class AppwriteApiClient implements ApiClient {
         Query.equal("info.type", matchType),
       ],
     );
-    _log.fine("Got document list.");
+    _log.fine("Got document list: ${list.documents[0].data}");
     return list;
   }
 
