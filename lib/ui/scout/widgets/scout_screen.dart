@@ -16,7 +16,7 @@ class ScoutScreen extends StatefulWidget {
 
 class _ScoutScreenState extends State<ScoutScreen> {
   int currentPageIndex = 0;
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

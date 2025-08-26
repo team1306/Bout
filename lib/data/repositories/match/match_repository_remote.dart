@@ -34,14 +34,24 @@ class MatchRepositoryRemote extends MatchRepository {
   Future<void> pullMatchData(int robot, int match, int matchType) async {
 
     final result = await _apiClient.fetchMatchData(matchType, match, robot);
-    _log.fine("Pulled match data for match ${MatchType.getName(matchType)} $match, robot $robot: $result");
+    // _log.fine("Pulled match data for match ${MatchType.getName(matchType)} $match, robot $robot: $result");
 
     _notes = result.remove("notes");
     try {
       _valueCache.clear();
-      _valueCache.addAll(Map<String, int>.fromEntries(result
-          .entries.where((e) => e is int)
-          .map((e) => MapEntry(e.key, e.value as int))));
+      Map<String, int> parsedIntegers = Map.fromEntries(
+          result.entries
+              .where((entry) =>
+          entry.value is String &&
+              int.tryParse(entry.value as String) != null
+          )
+              .map((entry) =>
+              MapEntry(entry.key, int.parse(entry.value as String))
+          )
+      );
+      
+      _valueCache.addAll(parsedIntegers);
+      _log.fine("Match filtered data + $_valueCache");
     } catch (e) {
       _log.fine("Error loading match data");
       return Future.error(e);
@@ -79,7 +89,7 @@ class MatchRepositoryRemote extends MatchRepository {
   @override
   Future<Map<String, dynamic>> getMatch() async {
     final data = Map<String, dynamic>.from(_valueCache);
-
+    _log.fine("Getting match");
     data["info.type"] = 0; //manually setting to qualifier
     data["notes"] = _notes;
     data["info.scouterId"] = await _authClient.getCurrentUserId();

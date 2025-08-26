@@ -34,17 +34,23 @@ class ScoutViewModel {
 
     _matchRepository.putCustomData(defaultValues);
     _matchRepository.setNotes("");
-    _createCommonValues(); 
+    _createCommonValues();
   }
 
   ScoutViewModel.loadMatch(MatchRepository matchRepository, CacheRepository cacheRepository, String? robot, String? match, String? type)
     : _matchRepository = matchRepository, _cacheRepository = cacheRepository {
 
     if (robot == null || match == null || type == null) throw NullException(message: "Scout page tried load from incomplete match identifiers");
-    matchRepository.pullMatchData(int.parse(robot), int.parse(match), int.parse(type));
+    matchRepository.pullMatchData(int.parse(robot), int.parse(match), int.parse(type)).then((_) => _reinvokeGetCommands());
     _log.fine("Loaded scout page from existing match");
 
     _createCommonValues();
+  }
+  
+  void _reinvokeGetCommands(){
+    for(var value in _getCommands.values){
+      value.execute();
+    }
   }
   
   late final Map<String, Command<void, int?>> _getCommands;
