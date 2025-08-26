@@ -4,7 +4,6 @@ import 'package:bout/data/repositories/match/match_repository.dart';
 import 'package:bout/data/repositories/match/match_type.dart';
 import 'package:bout/data/services/api_client.dart';
 import 'package:bout/data/services/auth/auth_client.dart';
-import 'package:bout/utils/null_exception.dart';
 import 'package:logging/logging.dart';
 
 class MatchRepositoryRemote extends MatchRepository {
@@ -38,9 +37,15 @@ class MatchRepositoryRemote extends MatchRepository {
     _log.fine("Pulled match data for match ${MatchType.getName(matchType)} $match, robot $robot: $result");
 
     _notes = result.remove("notes");
-
-    _valueCache.clear();
-    _valueCache.addAll(result as Map<String, int>);
+    try {
+      _valueCache.clear();
+      _valueCache.addAll(Map<String, int>.fromEntries(result
+          .entries.where((e) => e is int)
+          .map((e) => MapEntry(e.key, e.value as int))));
+    } catch (e) {
+      _log.fine("Error loading match data");
+      return Future.error(e);
+    }
   }
 
   @override

@@ -40,11 +40,7 @@ class AppwriteApiClient implements ApiClient {
     try {
       final allMatchDocuments = await tryGetAllMatches();
 
-      Set<Map<String, dynamic>> allMatchData = {};
-      for (Document document in allMatchDocuments.documents) {
-        allMatchData.add(document.data);
-      }
-      return allMatchData;
+      return allMatchDocuments.documents.map((doc) => doc.data).toSet();
     } on AppwriteException catch (e) {
       return Future.error(e);
     }
