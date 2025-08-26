@@ -85,4 +85,10 @@ class MatchRepositoryRemote extends MatchRepository {
     data["info.scouterId"] = await _authClient.getCurrentUserId();
     return data;
   }
+
+  @override
+  Future<void> putCustomData(Map<String, int> data) async {
+    _valueCache.clear();
+    _valueCache.addAll(data);
+  }
 }

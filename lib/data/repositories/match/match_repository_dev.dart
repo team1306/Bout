@@ -48,4 +48,10 @@ class MatchRepositoryDev extends MatchRepository {
     _valueCache.clear();
     _notes = "";
   }
+
+  @override
+  Future<void> putCustomData(Map<String, int> data) async {
+    _valueCache.clear();
+    _valueCache.addAll(data);
+  }
 }

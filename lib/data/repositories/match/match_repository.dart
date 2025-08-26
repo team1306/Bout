@@ -12,6 +12,8 @@ abstract class MatchRepository {
   ///Puts match data to storage
   Future<void> pushMatchData(bool force);
   
+  Future<void> putCustomData(Map<String, int> data);
+  
   ///Get cached notes
   Future<String> getNotes();
 

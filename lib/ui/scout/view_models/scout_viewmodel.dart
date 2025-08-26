@@ -6,12 +6,34 @@ import 'package:flutter_command/flutter_command.dart';
 import 'package:logging/logging.dart';
 
 class ScoutViewModel {
+  
+  static const defaultValues = {
+    "auto.leave": 0,
+    "auto.l1" : 0,
+    "auto.l2" : 0,
+    "auto.l3" : 0,
+    "auto.l4" : 0,
+    "auto.process" : 0,
+    "end.climb" : 0,
+    "end.role" : 0,
+    "end.driver" : 1,
+    "info.match" : 0,
+    "info.robot" : 0,
+    "teleop.l1" : 0,
+    "teleop.l2" : 0,
+    "teleop.l3" : 0,
+    "teleop.l4" : 0,
+    "teleop.process" : 0,
+    "teleop.net" : 0
+  };
+  
   ScoutViewModel(MatchRepository scoutRepository, CacheRepository cacheRepository)
     : _matchRepository = scoutRepository, _cacheRepository = cacheRepository {
     notesUpdate = Command.createAsync(_updateNotes, initialValue: "");
     submitMatchData = Command.createAsyncNoParam(_submitMatchData, initialValue: false);
 
-    _matchRepository.clearAllValues();
+    _matchRepository.putCustomData(defaultValues);
+    _matchRepository.setNotes("");
   }
 
   ScoutViewModel.loadMatch(MatchRepository matchRepository, CacheRepository cacheRepository, String? robot, String? match, String? type)
