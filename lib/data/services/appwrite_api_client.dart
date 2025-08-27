@@ -35,11 +35,11 @@ class AppwriteApiClient implements ApiClient {
   }
 
   @override
-  Future<Set<Map<String, dynamic>>> fetchAllMatchData() async {
+  Future<Set<Map<String, dynamic>>> fetchAllMatchDataFromScouter(String scouterId) async {
     try {
-      final allMatchDocuments = await tryGetAllMatches();
+      DocumentList documents = await getMatchesFromScouter(scouterId);
 
-      return allMatchDocuments.documents.map((doc) => doc.data).toSet();
+      return documents.documents.map((doc) => doc.data).toSet();
     } catch (e) {
       return Future.error(e);
     }
@@ -85,13 +85,16 @@ class AppwriteApiClient implements ApiClient {
     return document;
   }
 
-  Future<DocumentList> tryGetAllMatches() async {
-    DocumentList allDocuments = await _databases.listDocuments(
+  Future<DocumentList> getMatchesFromScouter(String scouterId) async {
+    DocumentList documents = await _databases.listDocuments(
         databaseId: _databaseId,
-        collectionId: _collectionId
+        collectionId: _collectionId,
+        queries: [
+          Query.equal("info.scouterId", scouterId)
+        ],
     );
-    _log.fine("Got all documents.");
-    return allDocuments;
+    _log.fine("Got documents.");
+    return documents;
   }
 
   @override

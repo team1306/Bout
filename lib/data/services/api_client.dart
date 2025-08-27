@@ -9,7 +9,7 @@ abstract class ApiClient {
     Map<String, dynamic> values, bool force
   );
 
-  Future<Set<Map<String, dynamic>>> fetchAllMatchData();
+  Future<Set<Map<String, dynamic>>> fetchAllMatchDataFromScouter(String scouterId);
 
   Future<void> updateMatchData(int robot, int match, int type, Map<String, dynamic> values);
 }
