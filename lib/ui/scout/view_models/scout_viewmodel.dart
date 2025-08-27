@@ -1,4 +1,3 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:bout/data/repositories/cache/cache_repository.dart';
 import 'package:bout/data/repositories/match/match_repository.dart';
 import 'package:bout/ui/scout/widgets/incrementer.dart';
@@ -35,16 +34,24 @@ class ScoutViewModel {
     _matchRepository.putCustomData(defaultValues);
     _matchRepository.setNotes("");
     _createCommonValues();
+
+    isUpdateMode = false;
   }
 
   ScoutViewModel.loadMatch(MatchRepository matchRepository, CacheRepository cacheRepository, String? robot, String? match, String? type)
     : _matchRepository = matchRepository, _cacheRepository = cacheRepository {
 
     if (robot == null || match == null || type == null) throw NullException(message: "Scout page tried load from incomplete match identifiers");
-    matchRepository.pullMatchData(int.parse(robot), int.parse(match), int.parse(type)).then((_) => _reinvokeGetCommands());
+    int robotNum = int.parse(robot), matchNum = int.parse(match), matchType = int.parse(type);
+    matchRepository.pullMatchData(robotNum, matchNum, matchType).then((_) => _reinvokeGetCommands());
     _log.fine("Loaded scout page from existing match");
 
     _createCommonValues();
+
+    isUpdateMode = true;
+    _originalMatch = matchNum;
+    _originalRobot = robotNum;
+    _originalType = matchType;
   }
   
   void _reinvokeGetCommands(){
@@ -66,12 +73,17 @@ class ScoutViewModel {
   late final Command<String, void> notesSet;
 
   late final Command<void, bool> submitMatchData;
+
+  late final bool isUpdateMode;
+  late final int? _originalRobot;
+  late final int? _originalMatch;
+  late final int? _originalType;
   
   void _createCommonValues() {
     submitMatchData = Command.createAsyncNoParam(_submitMatchData, initialValue: false);
     notesGet = Command.createAsyncNoParam(_getNotes, initialValue: "");
     notesSet = Command.createAsyncNoResult(_setNotes);
-    
+
     _getCommands = createGetCommands();
     _changeCommands = createChangeCommands();
     _setCommands = createSetCommands();
@@ -79,14 +91,25 @@ class ScoutViewModel {
   
   Future<bool> _submitMatchData() async{
     _log.fine("Submitted match data");
-    try {
-      await _matchRepository.pushMatchData(false);
-      _log.fine("Successfully sent request to repository");
-      return true;
-    } on AppwriteException{
-      _cacheRepository.addCachedMatch(await _matchRepository.getMatch());
-      _log.fine("Failed to push match data. Submitting to cache.");
-      return false;
+    if (!isUpdateMode) {
+      try {
+        await _matchRepository.pushMatchData(false);
+        _log.fine("Successfully sent submit request to repository");
+        return true;
+      } catch (e) {
+        _cacheRepository.addCachedMatch(await _matchRepository.getMatch());
+        _log.fine("Failed to push match data. Submitting to cache.");
+        return false;
+      }
+    } else {
+      try {
+        await _matchRepository.updateMatchData(_originalRobot!, _originalMatch!, _originalType!);
+        _log.fine("Successfully sent update request to repository");
+        return true;
+      } catch (e) {
+        _log.fine("Failed to update match data. Try again later.");
+        return false;
+      }
     }
   }
   

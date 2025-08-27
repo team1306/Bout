@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:bout/data/repositories/match/match_repository.dart';
-import 'package:bout/data/repositories/match/match_type.dart';
 import 'package:bout/data/services/api_client.dart';
 import 'package:bout/data/services/auth/auth_client.dart';
 import 'package:logging/logging.dart';
@@ -100,5 +99,11 @@ class MatchRepositoryRemote extends MatchRepository {
   Future<void> putCustomData(Map<String, int> data) async {
     _valueCache.clear();
     _valueCache.addAll(data);
+  }
+
+  @override
+  Future<void> updateMatchData(int originalRobot, int originalMatch, int originalType) async {
+    _log.fine("Sending request to update match data...");
+    await _apiClient.updateMatchData(originalRobot, originalMatch, originalType, await getMatch());
   }
 }

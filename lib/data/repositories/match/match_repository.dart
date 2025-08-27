@@ -23,4 +23,6 @@ abstract class MatchRepository {
   Future<void> setNotes(String notes);
   
   Future<Map<String, dynamic>> getMatch();
+
+  Future<void> updateMatchData(int originalRobot, int originalMatch, int originalType);
 }

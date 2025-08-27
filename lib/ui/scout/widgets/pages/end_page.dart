@@ -155,7 +155,7 @@ class _EndPageState extends State<EndPage> {
             ),
             FilledButton(
               onPressed: widget.viewModel.submitMatchData.execute,
-              child: Text("Submit Match"),
+              child: Text(widget.viewModel.isUpdateMode ? "Update Match" : "Submit Match"),
             ),
           ],
         ),

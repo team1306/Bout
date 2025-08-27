@@ -25,12 +25,11 @@ class AppwriteApiClient implements ApiClient {
     int robotNumber,
   ) async {
     try {
-      final list = await tryGetMatch(matchNumber, robotNumber, matchType);
-      _log.fine("Got document list.");
-      if(list.total != 1) return Future.error(ArgumentError("Document not found for match ${MatchType.getName(matchType)} $matchNumber, robot $robotNumber"));
-
-      return list.documents[0].data;
-    } on AppwriteException catch (e){
+      Document? document = await getMatchDocument(matchNumber, robotNumber, matchType);
+      if (document == null) return Future.error("No document found.");
+      _log.fine("Successfully fetched match data");
+      return document.data;
+    } catch (e){
       return Future.error(e);
     }
   }
@@ -41,7 +40,7 @@ class AppwriteApiClient implements ApiClient {
       final allMatchDocuments = await tryGetAllMatches();
 
       return allMatchDocuments.documents.map((doc) => doc.data).toSet();
-    } on AppwriteException catch (e) {
+    } catch (e) {
       return Future.error(e);
     }
   }
@@ -49,9 +48,8 @@ class AppwriteApiClient implements ApiClient {
   @override
   Future<void> pushMatchData(Map<String, dynamic> values, bool force) async {
     try {
-      if(!force){
-        final list = await tryGetMatch(values["info.match"], values["info.robot"], values["info.type"]);
-        if(list.total > 0) return Future.error(ArgumentError("Match with robot already exists"));
+      if(!force && await getMatchDocument(values["info.match"], values["info.robot"], values["info.type"]) != null){
+          return Future.error(ArgumentError("Match with robot already exists"));
       }
       
       await _databases.createDocument(
@@ -66,8 +64,8 @@ class AppwriteApiClient implements ApiClient {
     }
   }
   
-  Future<DocumentList> tryGetMatch(int matchNumber, int robotNumber, int matchType) async{
-
+  Future<Document?> getMatchDocument(int matchNumber, int robotNumber, int matchType) async {
+    _log.fine("Getting all documents from appwrite for ${MatchType.getName(matchType)} $matchNumber robot $robotNumber...");
     final list = await _databases.listDocuments(
       databaseId: _databaseId,
       collectionId: _collectionId,
@@ -77,8 +75,14 @@ class AppwriteApiClient implements ApiClient {
         Query.equal("info.type", matchType),
       ],
     );
-    _log.fine("Got document list: ${list.documents}");
-    return list;
+
+    _log.fine("DEBUG: Document list size:  ${list.documents.length}");
+
+    if (list.documents.length > 1) return Future.error("Too many documents for match");
+    if (list.documents.isEmpty) return null;
+
+    Document document = list.documents[0];
+    return document;
   }
 
   Future<DocumentList> tryGetAllMatches() async {
@@ -88,5 +92,30 @@ class AppwriteApiClient implements ApiClient {
     );
     _log.fine("Got all documents.");
     return allDocuments;
+  }
+
+  @override
+  Future<void> updateMatchData(int originalRobot, int originalMatch, int originalType, Map<String, dynamic> values) async {
+    try {
+      _log.fine("Retrieving document...");
+      Document? doc = await getMatchDocument(originalMatch, originalRobot, originalType);
+      if (doc == null) return Future.error("Document not found");
+      _log.fine("Successfully retrieved document.");
+
+      try {
+        _log.fine("Updating document...");
+        await _databases.updateDocument(
+            databaseId: _databaseId,
+            collectionId: _collectionId,
+            documentId: doc.$id,
+            data: values
+        );
+        _log.fine("Successfully updated document.");
+      } catch (e) {
+        return Future.error(e);
+      }
+    } catch (e) {
+      return Future.error(e);
+    }
   }
 }

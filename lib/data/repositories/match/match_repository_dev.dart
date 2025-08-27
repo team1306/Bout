@@ -54,4 +54,8 @@ class MatchRepositoryDev extends MatchRepository {
     _valueCache.clear();
     _valueCache.addAll(data);
   }
+
+  @override
+  Future<void> updateMatchData(int originalRobot, int originalMatch, int originalType) async {
+  }
 }

@@ -10,4 +10,6 @@ abstract class ApiClient {
   );
 
   Future<Set<Map<String, dynamic>>> fetchAllMatchData();
+
+  Future<void> updateMatchData(int robot, int match, int type, Map<String, dynamic> values);
 }
